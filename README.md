@@ -8,7 +8,7 @@ Ansible playbook for provisioning an Ubuntu development machine.
 - Wezterm (terminal)
 - Zsh (shell)
 - Docker (via geerlingguy.docker role)
-- Dev tools via mise (node, python, terraform)
+- Dev tools via mise
 
 ## Quick Start
 

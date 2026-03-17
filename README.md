@@ -39,18 +39,7 @@ Edit `config.yml` to customize:
 On the target Ubuntu machine:
 
 ```bash
-# Install git
-sudo apt update
-sudo apt install -y git
-
-# Install ansible-core
-pip3 install ansible-core
-```
-
-Or use the official Ansible installation script:
-
-```bash
-curl https://raw.githubusercontent.com/ansible/ansible/devel/installation-setup.sh | bash
+sudo apt update && sudo apt install -y git ansible-core
 ```
 
 ## Inventory

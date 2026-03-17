@@ -1,0 +1,15 @@
+[all]
+locolhost ansible_host=127.0.0.1 ansible_connection=local
+ubuntu-server ansible_host=192.168.1.10 ansible_user=admin
+
+[macos]
+localhost
+
+[linux]
+ubuntu-server
+
+[personal:children]
+linux
+
+[work:children]
+macos

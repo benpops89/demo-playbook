@@ -1,0 +1,16 @@
+---
+# Mise
+mise_version: "v2026.3.9"
+mise_tools:
+  - node@20
+  - python@3.14
+  - opencode@1.2.27
+  - neovim@0.11.6
+  - lazygit@0.60.0
+  - tmux@3.6a
+  - starship@1.24.2
+
+# App Packages
+apt_packages:
+  - wezterm
+  - zsh

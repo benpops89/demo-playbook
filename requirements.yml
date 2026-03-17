@@ -1,0 +1,11 @@
+---
+# Roles (Galaxy role format)
+roles:
+  - name: geerlingguy.docker
+    version: 7.4.0
+
+# Collections (Galaxy collection format)
+collections:
+  - name: benpops89.mise
+    source: git+https://github.com/benpops89/ansible-collection-mise
+    version: 0.2.3

@@ -1,12 +1,14 @@
 ---
 - name: Demo Playbook
-  hosts: all
+  hosts: localhost
+  connection: local
 
   vars_files:
     - config.yml
 
   roles:
-    - geerlingguy.docker
+    - role: geerlingguy.docker
+      become: true
 
   tasks:
     - name: Install the wezterm gpg key

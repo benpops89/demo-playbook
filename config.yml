@@ -14,3 +14,7 @@ mise_tools:
 apt_packages:
   - wezterm
   - zsh
+
+# Users in the docker group
+docker_users:
+  - demo

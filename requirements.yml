@@ -6,6 +6,6 @@ roles:
 
 # Collections (Galaxy collection format)
 collections:
-  - name: benpops89.mise
-    source: git+https://github.com/benpops89/ansible-collection-mise
-    version: 0.2.3
+  - name: git+https://github.com/benpops89/ansible-collection-mise
+    type: git
+    version: v0.2.3

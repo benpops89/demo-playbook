@@ -34,6 +34,25 @@ Edit `config.yml` to customize:
 - Ubuntu/Debian target
 - Python 3 on target
 
+### Target Machine Setup
+
+On the target Ubuntu machine:
+
+```bash
+# Install git
+sudo apt update
+sudo apt install -y git
+
+# Install ansible-core
+pip3 install ansible-core
+```
+
+Or use the official Ansible installation script:
+
+```bash
+curl https://raw.githubusercontent.com/ansible/ansible/devel/installation-setup.sh | bash
+```
+
 ## Inventory
 
 Edit `inventory` to add hosts. Default includes localhost for testing.

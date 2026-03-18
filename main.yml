@@ -39,13 +39,6 @@
         force: yes
       become: true
 
-    - name: Configure mise in shell rc
-      ansible.builtin.lineinfile:
-        path: "{{ ansible_user_dir }}/.zshenv"
-        line: 'export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"'
-        create: yes
-        mode: '0644'
-
     - name: Add tools to global mise config
       benpops89.mise.mise_tool:
         tools:

@@ -52,12 +52,18 @@
         mode: '0644'
         checksum: "{{ jetbrains_mono_sha256 }}"
 
+    - name: Check if JetBrains Mono fonts are extracted
+      ansible.builtin.stat:
+        path: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
+      register: jetbrains_fonts_dir
+
     - name: Extract JetBrains Mono Nerd Font
       ansible.builtin.unarchive:
         src: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono.zip"
         dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
         remote_src: yes
       notify: Rebuild font cache
+      when: not jetbrains_fonts_dir.stat.exists
 
     - name: Set default shell to zsh
       ansible.builtin.user:

@@ -41,7 +41,7 @@
 
     - name: Create fonts directory
       ansible.builtin.file:
-        path: "{{ ansible_user_dir }}/.local/share/fonts"
+        path: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
         state: directory
         mode: '0755'
 

@@ -35,8 +35,8 @@
       ansible.builtin.get_url:
         url: "https://github.com/jdx/mise/releases/download/{{ mise_version }}/mise-{{ mise_version }}-linux-x64"
         dest: /usr/local/bin/mise
-        mode: "0755"
-        force: yes
+        mode: '0755'
+        checksum: "{{ mise_sha256 }}"
       become: true
 
     - name: Create fonts directory

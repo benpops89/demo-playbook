@@ -1,6 +1,7 @@
 ---
 # Mise
 mise_version: "v2026.3.9"
+mise_sha256: "sha256:5302866459744a7bad872d7dccdc5e2cf5d32e80c46f142c805cc21c94dfb6ad"
 
 # App Packages
 apt_packages:
@@ -23,6 +24,7 @@ dotfiles_symlinks:
   - .config/tmux
   - .config/lazygit
   - .config/sheldon
+  - .config/wezterm
 
 # Users in the docker group
 docker_users:

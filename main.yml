@@ -11,60 +11,11 @@
       become: true
 
   tasks:
-    - name: Add wezterm apt repository
-      ansible.builtin.deb822_repository:
-        name: wezterm
-        uris:
-          - https://apt.fury.io/wez/
-        suites:
-          - '*'
-        components:
-          - '*'
-        signed_by: https://apt.fury.io/wez/gpg.key
-        state: present
-      become: true
+    - name: Include APT tasks
+      ansible.builtin.import_tasks: tasks/apt.yml
 
-    - name: Install apt packages
-      ansible.builtin.apt:
-        name: "{{ apt_packages }}"
-        state: present
-        update_cache: yes
-      become: true
-
-    - name: Download mise binary for Linux amd64
-      ansible.builtin.get_url:
-        url: "https://github.com/jdx/mise/releases/download/{{ mise_version }}/mise-{{ mise_version }}-linux-x64"
-        dest: /usr/local/bin/mise
-        mode: '0755'
-        checksum: "{{ mise_sha256 }}"
-      become: true
-
-    - name: Create fonts directory
-      ansible.builtin.file:
-        path: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
-        state: directory
-        mode: '0755'
-
-    - name: Download JetBrains Mono Nerd Font
-      ansible.builtin.get_url:
-        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ jetbrains_mono_version }}/JetBrainsMono.zip"
-        dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono.zip"
-        mode: '0644'
-        checksum: "{{ jetbrains_mono_sha256 }}"
-
-    - name: Check if JetBrains Mono fonts are extracted
-      ansible.builtin.find:
-        paths: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
-        file_type: file
-      register: jetbrains_fonts_files
-
-    - name: Extract JetBrains Mono Nerd Font
-      ansible.builtin.unarchive:
-        src: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono.zip"
-        dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
-        remote_src: yes
-      notify: Rebuild font cache
-      when: jetbrains_fonts_files.files | length == 0
+    - name: Include fonts tasks
+      ansible.builtin.import_tasks: tasks/fonts.yml
 
     - name: Set default shell to zsh
       ansible.builtin.user:
@@ -72,24 +23,11 @@
         shell: /usr/bin/zsh
       become: true
 
-    - name: Clone dotfiles repo
-      ansible.builtin.git:
-        repo: "{{ dotfiles_repo }}"
-        dest: "{{ dotfiles_dir }}"
-        version: main
-        force: yes
+    - name: Include dotfiles tasks
+      ansible.builtin.import_tasks: tasks/dotfiles.yml
 
-    - name: Create symlinks from dotfiles
-      ansible.builtin.file:
-        src: "{{ dotfiles_dir }}/{{ item }}"
-        dest: "{{ ansible_user_dir }}/{{ item }}"
-        state: link
-      loop: "{{ dotfiles_symlinks }}"
-
-    - name: Add tools using mise
-      benpops89.mise.mise_sync:
-        global: true
-        trust: true
+    - name: Include mise tasks
+      ansible.builtin.import_tasks: tasks/mise.yml
 
   handlers:
     - name: Rebuild font cache

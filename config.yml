@@ -15,6 +15,9 @@ apt_packages:
   - wezterm
   - zsh
 
+# Fonts
+jetbrains_mono_version: "3.4.0"
+
 # Users in the docker group
 docker_users:
   - demo

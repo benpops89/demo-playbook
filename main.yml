@@ -46,6 +46,18 @@
         global: true
       loop: "{{ mise_tools }}"
 
+    - name: Download JetBrains Mono Nerd Font
+      ansible.builtin.unarchive:
+        src: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ jetbrains_mono_version }}/JetBrainsMono.zip"
+        dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
+        creates: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
+        remote_src: yes
+
+    - name: Rebuild font cache
+      community.general.fonts_domain:
+        cache_timeout: 900
+        state: updated
+
     - name: Set default shell to zsh
       ansible.builtin.user:
         name: "{{ ansible_user_id }}"

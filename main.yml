@@ -45,3 +45,9 @@
           - "{{ item }}"
         global: true
       loop: "{{ mise_tools }}"
+
+    - name: Set default shell to zsh
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        shell: /usr/bin/zsh
+      become: true

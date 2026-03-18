@@ -57,6 +57,21 @@
         shell: /usr/bin/zsh
       become: true
 
+    - name: Clone dotfiles repo
+      ansible.builtin.git:
+        repo: "{{ dotfiles_repo }}"
+        dest: "{{ dotfiles_dir }}"
+        version: main
+        force: yes
+
+    - name: Create symlinks from dotfiles
+      ansible.builtin.file:
+        src: "{{ dotfiles_dir }}/{{ item }}"
+        dest: "{{ ansible_user_dir }}/{{ item }}"
+        state: link
+        force: yes
+      loop: "{{ dotfiles_symlinks }}"
+
     - name: Add tools using mise
       benpops89.mise.mise_sync:
         global: true

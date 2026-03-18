@@ -10,6 +10,20 @@ apt_packages:
 # Fonts
 jetbrains_mono_version: "3.4.0"
 
+# Dotfiles
+dotfiles_repo: "https://github.com/benpops89/dotfiles.git"
+dotfiles_dir: "{{ ansible_user_dir }}/dotfiles"
+
+dotfiles_symlinks:
+  - .zshrc
+  - .zshenv
+  - .config/opencode
+  - .config/nvim
+  - .config/starship.toml
+  - .config/tmux
+  - .config/lazygit
+  - .config/mise
+
 # Users in the docker group
 docker_users:
   - demo

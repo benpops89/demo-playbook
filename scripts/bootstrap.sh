@@ -56,23 +56,13 @@ check_dependencies() {
 
     if [ -n "$MISSING" ]; then
         log_info "Installing missing packages:$MISSING"
-
-        if [ "$(id -u)" -ne 0 ]; then
-            error_exit "Please run with sudo to install packages"
-        fi
-
-        apt update && apt install -y$MISSING
+        sudo apt update && sudo apt install -y$MISSING
     fi
 
     if ! command_exists ansible-core; then
         log_warn "ansible-core is not installed"
         log_info "Installing ansible-core..."
-
-        if [ "$(id -u)" -ne 0 ]; then
-            error_exit "Please run with sudo to install ansible-core"
-        fi
-
-        apt update && apt install -y ansible-core
+        sudo apt update && sudo apt install -y ansible-core
     else
         log_info "ansible-core is installed"
     fi
@@ -125,10 +115,6 @@ main() {
     printf "  Demo Playbook Bootstrap\n"
     printf "========================================\n"
     printf "\n"
-
-    if [ "$(id -u)" -eq 0 ]; then
-        error_exit "Please run as a normal user, not root. sudo will be used when needed."
-    fi
 
     check_dependencies
     setup_repo

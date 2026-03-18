@@ -57,7 +57,6 @@
         src: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono.zip"
         dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
         remote_src: yes
-        creates: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
       notify: Rebuild font cache
 
     - name: Set default shell to zsh

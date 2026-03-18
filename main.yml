@@ -6,9 +6,6 @@
   vars_files:
     - config.yml
 
-  handlers:
-    - import_tasks: handlers/main.yml
-
   roles:
     - role: geerlingguy.docker
       become: true

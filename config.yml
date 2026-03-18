@@ -22,6 +22,7 @@ dotfiles_symlinks:
   - .config/starship.toml
   - .config/tmux
   - .config/lazygit
+  - .config/sheldon
 
 # Users in the docker group
 docker_users:

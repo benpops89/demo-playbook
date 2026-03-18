@@ -9,6 +9,7 @@
   roles:
     - role: geerlingguy.docker
       become: true
+    - common
 
   tasks:
     - name: Add wezterm apt repository
@@ -51,9 +52,7 @@
         dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
         creates: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
         remote_src: yes
-
-    - name: Rebuild font cache
-      ansible.builtin.command: fc-cache -fv
+      notify: Rebuild font cache
 
     - name: Set default shell to zsh
       ansible.builtin.user:

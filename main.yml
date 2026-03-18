@@ -11,17 +11,16 @@
       become: true
 
   tasks:
-    - name: Install the wezterm gpg key
-      ansible.builtin.get_url:
-        url: https://apt.fury.io/wez/gpg.key
-        dest: /etc/apt/trusted.gpg.d/wezterm-fury.asc
-        mode: "644"
-        force: yes
-
     - name: Add wezterm apt repository
-      ansible.builtin.apt_repository:
-        repo: deb https://apt.fury.io/wez/ * *
-        filename: wezterm
+      ansible.builtin.deb822_repository:
+        name: wezterm
+        uris:
+          - https://apt.fury.io/wez/
+        suites:
+          - '*'
+        components:
+          - '*'
+        signed_by: https://apt.fury.io/wez/gpg.key
         state: present
 
     - name: Install apt packages

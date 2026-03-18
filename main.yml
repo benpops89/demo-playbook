@@ -22,11 +22,13 @@
           - '*'
         signed_by: https://apt.fury.io/wez/gpg.key
         state: present
+      become: true
 
     - name: Install apt packages
       ansible.builtin.apt:
         name: "{{ apt_packages }}"
         state: present
+      become: true
 
     - name: Download mise binary for Linux amd64
       ansible.builtin.get_url:
@@ -34,6 +36,7 @@
         dest: /usr/local/bin/mise
         mode: "0755"
         force: yes
+      become: true
 
     - name: Add tools to global mise config
       benpops89.mise.mise_tool:

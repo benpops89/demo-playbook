@@ -22,7 +22,6 @@ dotfiles_symlinks:
   - .config/starship.toml
   - .config/tmux
   - .config/lazygit
-  - .config/mise
 
 # Users in the docker group
 docker_users:

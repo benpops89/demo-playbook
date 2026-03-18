@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
+#!/bin/sh
 
 # Colours
 RED='\033[0;31m'
@@ -16,15 +14,15 @@ INSTALL_DIR="$HOME/demo-playbook"
 
 # Functions
 log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+    printf "%b[INFO]%b %s\n" "$GREEN" "$NC" "$1"
 }
 
 log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
+    printf "%b[WARN]%b %s\n" "$YELLOW" "$NC" "$1"
 }
 
 log_error() {
-    echo -e "${RED}[ERROR]${NC} $1" >&2
+    printf "%b[ERROR]%b %s\n" "$RED" "$NC" "$1" >&2
 }
 
 error_exit() {
@@ -33,7 +31,7 @@ error_exit() {
 }
 
 log_step() {
-    echo -e "${BLUE}[STEP]${NC} $1"
+    printf "%b[STEP]%b %s\n" "$BLUE" "$NC" "$1"
 }
 
 # Check if command exists
@@ -45,27 +43,25 @@ command_exists() {
 check_dependencies() {
     log_step "Checking dependencies..."
 
-    local deps=("git" "python3")
-    local missing=()
+    MISSING=""
 
-    for dep in "${deps[@]}"; do
-        if ! command_exists "$dep"; then
-            missing+=("$dep")
-        else
+    for dep in git python3; do
+        if command_exists "$dep"; then
             log_info "$dep is installed"
+        else
+            log_warn "$dep is not installed"
+            MISSING="$MISSING $dep"
         fi
     done
 
-    if [ ${#missing[@]} -gt 0 ]; then
-        log_warn "Missing dependencies: ${missing[*]}"
-        log_info "Installing missing packages..."
+    if [ -n "$MISSING" ]; then
+        log_info "Installing missing packages:$MISSING"
 
         if [ "$(id -u)" -ne 0 ]; then
             error_exit "Please run with sudo to install packages"
         fi
 
-        apt update
-        apt install -y "${missing[@]}"
+        apt update && apt install -y$MISSING
     fi
 
     if ! command_exists ansible-core; then
@@ -76,8 +72,7 @@ check_dependencies() {
             error_exit "Please run with sudo to install ansible-core"
         fi
 
-        apt update
-        apt install -y ansible-core
+        apt update && apt install -y ansible-core
     else
         log_info "ansible-core is installed"
     fi
@@ -89,13 +84,13 @@ setup_repo() {
 
     if [ -d "$INSTALL_DIR" ]; then
         log_info "Repository already exists at $INSTALL_DIR"
-        cd "$INSTALL_DIR"
+        cd "$INSTALL_DIR" || exit 1
         log_info "Updating repository..."
         git pull origin "$BRANCH"
     else
         log_info "Cloning repository to $INSTALL_DIR..."
         git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR"
-        cd "$INSTALL_DIR"
+        cd "$INSTALL_DIR" || exit 1
     fi
 }
 
@@ -107,10 +102,11 @@ install_ansible_deps() {
 
 # Prompt for confirmation
 prompt_confirm() {
-    echo ""
-    read -rp "Ready to run Ansible playbook? [y/N] " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    printf "\nReady to run Ansible playbook? [y/N] "
+    read -r REPLY
+    printf "\n"
+
+    if [ "$REPLY" != "y" ] && [ "$REPLY" != "Y" ]; then
         log_info "Skipping playbook run. You can run it later with:"
         echo "  cd $INSTALL_DIR && ansible-playbook main.yml -i inventory -K"
         exit 0
@@ -125,11 +121,10 @@ run_playbook() {
 
 # Main
 main() {
-    echo ""
-    echo -e "${BLUE}========================================${NC}"
-    echo -e "${BLUE}  Demo Playbook Bootstrap${NC}"
-    echo -e "${BLUE}========================================${NC}"
-    echo ""
+    printf "\n========================================\n"
+    printf "  Demo Playbook Bootstrap\n"
+    printf "========================================\n"
+    printf "\n"
 
     if [ "$(id -u)" -eq 0 ]; then
         error_exit "Please run as a normal user, not root. sudo will be used when needed."

@@ -39,6 +39,12 @@
         force: yes
       become: true
 
+    - name: Create fonts directory
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
+        state: directory
+        mode: '0755'
+
     - name: Download JetBrains Mono Nerd Font
       ansible.builtin.unarchive:
         src: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ jetbrains_mono_version }}/JetBrainsMono.zip"

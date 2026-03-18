@@ -10,6 +10,7 @@ apt_packages:
 
 # Fonts
 jetbrains_mono_version: "3.4.0"
+jetbrains_mono_sha256: "sha256:76f05ff3ace48a464a6ca57977998784ff7bdbb65a6d915d7e401cd3927c493c"
 
 # Dotfiles
 dotfiles_repo: "https://github.com/benpops89/demo-dots.git"

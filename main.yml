@@ -46,8 +46,15 @@
         mode: '0755'
 
     - name: Download JetBrains Mono Nerd Font
+      ansible.builtin.get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ jetbrains_mono_version }}/JetBrainsMono.zip"
+        dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono.zip"
+        mode: '0644'
+        checksum: "{{ jetbrains_mono_sha256 }}"
+
+    - name: Extract JetBrains Mono Nerd Font
       ansible.builtin.unarchive:
-        src: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ jetbrains_mono_version }}/JetBrainsMono.zip"
+        src: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono.zip"
         dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
         remote_src: yes
       notify: Rebuild font cache

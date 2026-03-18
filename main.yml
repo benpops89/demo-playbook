@@ -24,6 +24,11 @@
         state: present
       become: true
 
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+      become: true
+
     - name: Install apt packages
       ansible.builtin.apt:
         name: "{{ apt_packages }}"

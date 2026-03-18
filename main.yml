@@ -39,13 +39,6 @@
         force: yes
       become: true
 
-    - name: Add tools to global mise config
-      benpops89.mise.mise_tool:
-        tools:
-          - "{{ item }}"
-        global: true
-      loop: "{{ mise_tools }}"
-
     - name: Download JetBrains Mono Nerd Font
       ansible.builtin.unarchive:
         src: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ jetbrains_mono_version }}/JetBrainsMono.zip"
@@ -63,3 +56,8 @@
         name: "{{ ansible_user_id }}"
         shell: /usr/bin/zsh
       become: true
+
+    - name: Add tools using mise
+      benpops89.mise.mise_sync:
+        global: true
+        trust: true

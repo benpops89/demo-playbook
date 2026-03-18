@@ -52,7 +52,6 @@
       ansible.builtin.unarchive:
         src: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ jetbrains_mono_version }}/JetBrainsMono.zip"
         dest: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
-        creates: "{{ ansible_user_dir }}/.local/share/fonts/JetBrainsMono"
         remote_src: yes
       notify: Rebuild font cache
 

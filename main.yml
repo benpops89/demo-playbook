@@ -47,9 +47,7 @@
         remote_src: yes
 
     - name: Rebuild font cache
-      community.general.fonts_domain:
-        cache_timeout: 900
-        state: updated
+      ansible.builtin.command: fc-cache -fv
 
     - name: Set default shell to zsh
       ansible.builtin.user:

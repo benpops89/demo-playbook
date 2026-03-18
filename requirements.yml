@@ -6,7 +6,6 @@ roles:
 
 # Collections (Galaxy collection format)
 collections:
-  - name: community.general
   - name: git+https://github.com/benpops89/ansible-collection-mise
     type: git
     version: v0.2.3

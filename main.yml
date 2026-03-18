@@ -7,8 +7,7 @@
     - config.yml
 
   handlers:
-    - name: Rebuild font cache
-      ansible.builtin.command: fc-cache -fv
+    - import_tasks: handlers/main.yml
 
   roles:
     - role: geerlingguy.docker

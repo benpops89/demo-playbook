@@ -11,7 +11,7 @@ apt_packages:
 jetbrains_mono_version: "3.4.0"
 
 # Dotfiles
-dotfiles_repo: "https://github.com/benpops89/dotfiles.git"
+dotfiles_repo: "https://github.com/benpops89/demo-dots.git"
 dotfiles_dir: "{{ ansible_user_dir }}/dotfiles"
 
 dotfiles_symlinks:

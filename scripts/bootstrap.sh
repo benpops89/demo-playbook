@@ -90,19 +90,6 @@ install_ansible_deps() {
     ansible-galaxy install -r requirements.yml
 }
 
-# Prompt for confirmation
-prompt_confirm() {
-    printf "\nReady to run Ansible playbook? [y/N] "
-    read -r REPLY
-    printf "\n"
-
-    if [ "$REPLY" != "y" ] && [ "$REPLY" != "Y" ]; then
-        log_info "Skipping playbook run. You can run it later with:"
-        echo "  cd $INSTALL_DIR && ansible-playbook main.yml -i inventory -K"
-        exit 0
-    fi
-}
-
 # Run Ansible playbook
 run_playbook() {
     log_step "Running Ansible playbook..."
@@ -119,7 +106,6 @@ main() {
     check_dependencies
     setup_repo
     install_ansible_deps
-    prompt_confirm
     run_playbook
 
     log_info "Bootstrap complete!"

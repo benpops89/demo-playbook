@@ -76,3 +76,7 @@
       benpops89.mise.mise_sync:
         global: true
         trust: true
+
+  handlers:
+    - name: Rebuild font cache
+      ansible.builtin.command: fc-cache -fv

@@ -12,6 +12,9 @@ REPO="https://github.com/benpops89/demo-playbook.git"
 BRANCH="main"
 INSTALL_DIR="$HOME/demo-playbook"
 
+# Verbosity
+VERBOSE="${VERBOSE:-0}"
+
 # Progress tracking
 TOTAL_STEPS=5
 CURRENT_STEP=0
@@ -19,7 +22,9 @@ COMPLETED_STEPS=""
 
 # Functions
 log_success() {
-    printf "%b[ OK ]%b %s\n" "$GREEN" "$NC" "$1"
+    if [ "$VERBOSE" = "1" ]; then
+        printf "%b[ OK ]%b %s\n" "$GREEN" "$NC" "$1"
+    fi
 }
 
 log_warn() {
@@ -59,7 +64,7 @@ add_completed() {
 show_summary() {
     printf "\n\n"
     echo "   ╔══════════════════════════════════════════════════╗"
-    echo "   ║           Bootstrap Complete!                     ║"
+    echo "   ║           Bootstrap Complete!                 ║"
     echo "   ╠══════════════════════════════════════════════════╣"
     echo "$COMPLETED_STEPS"
     echo "   ╚══════════════════════════════════════════════════╝"
@@ -76,19 +81,19 @@ check_dependencies() {
     MISSING=""
 
     for dep in git python3; do
-        if command_exists "$dep"; then
-            log_success "$dep is installed"
-        else
-            log_warn "$dep is not installed"
+        if ! command_exists "$dep"; then
             MISSING="$MISSING $dep"
         fi
     done
 
     if ! command_exists ansible-core; then
-        log_warn "ansible-core is not installed"
         MISSING="$MISSING ansible-core"
+    fi
+
+    if [ -n "$MISSING" ]; then
+        log_warn "Missing:$MISSING"
     else
-        log_success "ansible-core is installed"
+        log_success "All dependencies installed"
     fi
 
     add_completed "Dependencies checked"

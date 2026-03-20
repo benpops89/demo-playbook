@@ -12,9 +12,30 @@ REPO="https://github.com/benpops89/demo-playbook.git"
 BRANCH="main"
 INSTALL_DIR="$HOME/demo-playbook"
 
+# Banner
+BANNER='
+   ╔══════════════════════════════════════════════════╗
+   ║                                                      ║
+   ║   ██████╗ ██████╗ ██╗███████╗████████╗          ║
+   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝          ║
+   ║   ██████╔╝██████╔╝██║█████╗     ██║             ║
+   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║             ║
+   ║   ██║     ██║  ██║██║██║        ██║             ║
+   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝             ║
+   ║                                                      ║
+   ║        Ansible Development Setup                      ║
+   ║                                                      ║
+   ╚══════════════════════════════════════════════════╝
+'
+
+# Progress tracking
+TOTAL_STEPS=5
+CURRENT_STEP=0
+COMPLETED_STEPS=""
+
 # Functions
-log_info() {
-    printf "%b[INFO]%b %s\n" "$GREEN" "$NC" "$1"
+log_success() {
+    printf "%b[ OK ]%b %s\n" "$GREEN" "$NC" "$1"
 }
 
 log_warn() {
@@ -30,16 +51,41 @@ error_exit() {
     exit 1
 }
 
-log_step() {
-    printf "%b[STEP]%b %s\n" "$BLUE" "$NC" "$1"
+update_progress() {
+    PERCENT=$(expr $CURRENT_STEP \* 100 / $TOTAL_STEPS)
+    BAR_LEN=40
+    FILLED=$(expr $PERCENT \* $BAR_LEN / 100)
+    EMPTY=$(expr $BAR_LEN - $FILLED)
+    
+    printf "\r   [%*s" $FILLED "" | tr ' ' '='
+    printf "%*s] %3d%%  %s" $EMPTY "" $PERCENT "$1"
 }
 
-# Check if command exists
+log_step() {
+    CURRENT_STEP=$(expr $CURRENT_STEP + 1)
+    printf "%b[%d/%d]%b %s\n" "$BLUE" "$CURRENT_STEP" "$TOTAL_STEPS" "$NC" "$1"
+    update_progress "$1"
+}
+
+add_completed() {
+    COMPLETED_STEPS="${COMPLETED_STEPS}\n   \033[0;32m✓\033[0m $1"
+}
+
+show_summary() {
+    printf "\n"
+    echo "   ╔══════════════════════════════════════════════════╗"
+    echo "   ║           Bootstrap Complete!                 ║"
+    echo "   ╠══════════════════════════════════════════════════╣"
+    printf "   $COMPLETED_STEPS"
+    echo ""
+    echo "   ╚══════════════════════════════════════════════════╝"
+    echo ""
+}
+
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Check and install dependencies
 check_dependencies() {
     log_step "Checking dependencies..."
 
@@ -47,68 +93,75 @@ check_dependencies() {
 
     for dep in git python3; do
         if command_exists "$dep"; then
-            log_info "$dep is installed"
+            log_success "$dep is installed"
         else
             log_warn "$dep is not installed"
             MISSING="$MISSING $dep"
         fi
     done
 
-    if [ -n "$MISSING" ]; then
-        log_info "Installing missing packages:$MISSING"
-        sudo apt update && sudo apt install -y$MISSING
-    fi
-
     if ! command_exists ansible-core; then
         log_warn "ansible-core is not installed"
-        log_info "Installing ansible-core..."
-        sudo apt update && sudo apt install -y ansible-core
+        MISSING="$MISSING ansible-core"
     else
-        log_info "ansible-core is installed"
+        log_success "ansible-core is installed"
+    fi
+
+    add_completed "Dependencies checked"
+    
+    if [ -n "$MISSING" ]; then
+        install_dependencies "$MISSING"
     fi
 }
 
-# Clone or update repo
+install_dependencies() {
+    MISSING_PKGS="$1"
+    log_step "Installing dependencies..."
+    sudo apt update && sudo apt install -y$MISSING_PKGS
+    add_completed "Dependencies installed"
+}
+
 setup_repo() {
     log_step "Setting up repository..."
 
     if [ -d "$INSTALL_DIR" ]; then
-        log_info "Repository already exists at $INSTALL_DIR"
+        log_success "Repository already exists at $INSTALL_DIR"
         cd "$INSTALL_DIR" || exit 1
-        log_info "Updating repository..."
         git pull origin "$BRANCH"
     else
-        log_info "Cloning repository to $INSTALL_DIR..."
         git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR"
         cd "$INSTALL_DIR" || exit 1
     fi
+    
+    add_completed "Repository ready"
 }
 
-# Install Ansible dependencies
 install_ansible_deps() {
     log_step "Installing Ansible dependencies..."
     ansible-galaxy install -r requirements.yml
+    add_completed "Ansible deps ready"
 }
 
-# Run Ansible playbook
 run_playbook() {
     log_step "Running Ansible playbook..."
     ansible-playbook main.yml -i inventory -K
+    add_completed "Playbook executed"
 }
 
-# Main
 main() {
-    printf "\n========================================\n"
-    printf "  Demo Playbook Bootstrap\n"
-    printf "========================================\n"
-    printf "\n"
+    echo "$BANNER"
+    
+    echo "   ╔══════════════════════════════════════════════════╗"
+    echo "   ║           Progress                              ║"
+    echo "   ╚══════════════════════════════════════════════════╝"
+    echo ""
 
     check_dependencies
     setup_repo
     install_ansible_deps
     run_playbook
 
-    log_info "Bootstrap complete!"
+    show_summary
 }
 
 main "$@"

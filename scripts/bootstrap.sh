@@ -12,21 +12,12 @@ REPO="https://github.com/benpops89/demo-playbook.git"
 BRANCH="main"
 INSTALL_DIR="$HOME/demo-playbook"
 
-# Verbosity
-VERBOSE="${VERBOSE:-0}"
-
 # Progress tracking
 TOTAL_STEPS=5
 CURRENT_STEP=0
 COMPLETED_STEPS=""
 
 # Functions
-log_success() {
-  if [ "$VERBOSE" = "1" ]; then
-    printf "%b[ OK ]%b %s\n" "$GREEN" "$NC" "$1"
-  fi
-}
-
 log_warn() {
   printf "%b[WARN]%b %s\n" "$YELLOW" "$NC" "$1"
 }
@@ -45,14 +36,13 @@ update_progress() {
   BAR_LEN=40
   FILLED=$(expr $PERCENT \* $BAR_LEN / 100)
   EMPTY=$(expr $BAR_LEN - $FILLED)
-
+  
   printf "\r   [%*s" $FILLED "" | tr ' ' '='
   printf "%*s] %3d%%  %s" $EMPTY "" $PERCENT "$1"
 }
 
 log_step() {
   CURRENT_STEP=$(expr $CURRENT_STEP + 1)
-  printf "%b[%d/%d]%b %s\n" "$BLUE" "$CURRENT_STEP" "$TOTAL_STEPS" "$NC" "$1"
   update_progress "$1"
 }
 
@@ -64,7 +54,7 @@ add_completed() {
 show_summary() {
   printf "\n\n"
   echo "   ╔══════════════════════════════════════════════════╗"
-  echo "   ║           Bootstrap Complete!                    ║"
+  echo "   ║           Bootstrap Complete!                     ║"
   echo "   ╠══════════════════════════════════════════════════╣"
   echo "$COMPLETED_STEPS"
   echo "   ╚══════════════════════════════════════════════════╝"
@@ -76,8 +66,6 @@ command_exists() {
 }
 
 check_dependencies() {
-  log_step "Checking dependencies..."
-
   MISSING=""
 
   for dep in git python3; do
@@ -92,47 +80,37 @@ check_dependencies() {
 
   if [ -n "$MISSING" ]; then
     log_warn "Missing:$MISSING"
-  else
-    log_success "All dependencies installed"
+    install_dependencies "$MISSING"
   fi
 
   add_completed "Dependencies checked"
-
-  if [ -n "$MISSING" ]; then
-    install_dependencies "$MISSING"
-  fi
 }
 
 install_dependencies() {
-  MISSING_PKGS="$1"
   log_step "Installing dependencies..."
-  sudo apt update && sudo apt install -y$MISSING_PKGS
+  sudo apt update && sudo apt install -y$1
   add_completed "Dependencies installed"
 }
 
 setup_repo() {
-  log_step "Setting up repository..."
-
   if [ -d "$INSTALL_DIR" ]; then
-    log_success "Repository already exists"
     cd "$INSTALL_DIR" || exit 1
-    git pull origin "$BRANCH"
   else
     git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR"
     cd "$INSTALL_DIR" || exit 1
   fi
-
+  
   add_completed "Repository ready"
 }
 
 install_ansible_deps() {
-  log_step "Installing Ansible dependencies..."
+  log_step "Installing Ansible deps..."
   ansible-galaxy install -r requirements.yml
   add_completed "Ansible deps ready"
 }
 
 run_playbook() {
-  log_step "Running Ansible playbook..."
+  log_step "Running playbook..."
   ansible-playbook main.yml -i inventory -K
   add_completed "Playbook executed"
 }
@@ -142,23 +120,20 @@ main() {
 
    ╔══════════════════════════════════════════════════╗
    ║                                                  ║
-   ║   ██████╗ ██████╗ ██╗███████╗████████╗           ║
-   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝           ║
-   ║   ██████╔╝██████╔╝██║█████╗     ██║              ║
-   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║              ║
-   ║   ██║     ██║  ██║██║██║        ██║              ║
-   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝              ║
+   ║   ██████╗ ██████╗ ██╗███████╗████████╗          ║
+   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝          ║
+   ║   ██████╔╝██████╔╝██║█████╗     ██║             ║
+   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║             ║
+   ║   ██║     ██║  ██║██║██║        ██║             ║
+   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝             ║
    ║                                                  ║
-   ║        Ansible Development Setup                 ║
+   ║        Ansible Development Setup                  ║
    ║                                                  ║
-   ╚══════════════════════════════════════════════════╝
-
-   ╔══════════════════════════════════════════════════╗
-   ║                  Progress                        ║
    ╚══════════════════════════════════════════════════╝
 
 EOF
 
+  echo ""
   check_dependencies
   setup_repo
   install_ansible_deps

@@ -70,16 +70,6 @@ install_ansible_deps() {
   ansible-galaxy install -r requirements.yml >/dev/null 2>&1
 }
 
-authenticate() {
-  sudo -n true >/dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    echo "   (already authenticated)"
-  else
-    echo "   "
-    sudo -v
-  fi
-}
-
 main() {
   cat <<'EOF'
 
@@ -102,7 +92,18 @@ EOF
   run_step "Installing dependencies" "Installed dependencies" ":"
   run_step "Setting up repository" "Set up repository" "setup_repo"
   run_step "Installing Ansible deps" "Installed Ansible deps" "install_ansible_deps"
-  run_step "Authenticating for playbook" "Authenticated for playbook" "authenticate"
+
+  echo "   ● Authenticating for playbook..."
+  AUTH_OUTPUT=$(sudo -n true 2>&1)
+  if [ -z "$AUTH_OUTPUT" ]; then
+    echo "   (already authenticated)"
+  else
+    echo "   "
+    sudo -v
+  fi
+  echo "   ✓ Authenticated for playbook"
+  echo ""
+
   run_step "Running playbook" "Ran playbook" "ansible-playbook main.yml -i inventory"
 
   log_success

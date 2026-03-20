@@ -12,22 +12,6 @@ REPO="https://github.com/benpops89/demo-playbook.git"
 BRANCH="main"
 INSTALL_DIR="$HOME/demo-playbook"
 
-# Banner
-BANNER='
-   ╔══════════════════════════════════════════════════╗
-   ║                                                      ║
-   ║   ██████╗ ██████╗ ██╗███████╗████████╗          ║
-   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝          ║
-   ║   ██████╔╝██████╔╝██║█████╗     ██║             ║
-   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║             ║
-   ║   ██║     ██║  ██║██║██║        ██║             ║
-   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝             ║
-   ║                                                      ║
-   ║        Ansible Development Setup                      ║
-   ║                                                      ║
-   ╚══════════════════════════════════════════════════╝
-'
-
 # Progress tracking
 TOTAL_STEPS=5
 CURRENT_STEP=0
@@ -68,16 +52,16 @@ log_step() {
 }
 
 add_completed() {
-    COMPLETED_STEPS="${COMPLETED_STEPS}\n   \033[0;32m✓\033[0m $1"
+    COMPLETED_STEPS="${COMPLETED_STEPS}
+   ${GREEN}✓${NC} $1"
 }
 
 show_summary() {
-    printf "\n"
+    printf "\n\n"
     echo "   ╔══════════════════════════════════════════════════╗"
-    echo "   ║           Bootstrap Complete!                 ║"
+    echo "   ║           Bootstrap Complete!                     ║"
     echo "   ╠══════════════════════════════════════════════════╣"
-    printf "   $COMPLETED_STEPS"
-    echo ""
+    echo "$COMPLETED_STEPS"
     echo "   ╚══════════════════════════════════════════════════╝"
     echo ""
 }
@@ -125,7 +109,7 @@ setup_repo() {
     log_step "Setting up repository..."
 
     if [ -d "$INSTALL_DIR" ]; then
-        log_success "Repository already exists at $INSTALL_DIR"
+        log_success "Repository already exists"
         cd "$INSTALL_DIR" || exit 1
         git pull origin "$BRANCH"
     else
@@ -149,12 +133,26 @@ run_playbook() {
 }
 
 main() {
-    echo "$BANNER"
-    
-    echo "   ╔══════════════════════════════════════════════════╗"
-    echo "   ║           Progress                              ║"
-    echo "   ╚══════════════════════════════════════════════════╝"
-    echo ""
+    cat << 'EOF'
+
+   ╔══════════════════════════════════════════════════╗
+   ║                                                      ║
+   ║   ██████╗ ██████╗ ██╗███████╗████████╗          ║
+   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝          ║
+   ║   ██████╔╝██████╔╝██║█████╗     ██║             ║
+   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║             ║
+   ║   ██║     ██║  ██║██║██║        ██║             ║
+   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝             ║
+   ║                                                      ║
+   ║        Ansible Development Setup                      ║
+   ║                                                      ║
+   ╚══════════════════════════════════════════════════╝
+
+   ╔══════════════════════════════════════════════════╗
+   ║                  Progress                        ║
+   ╚══════════════════════════════════════════════════╝
+
+EOF
 
     check_dependencies
     setup_repo

@@ -22,135 +22,135 @@ COMPLETED_STEPS=""
 
 # Functions
 log_success() {
-    if [ "$VERBOSE" = "1" ]; then
-        printf "%b[ OK ]%b %s\n" "$GREEN" "$NC" "$1"
-    fi
+  if [ "$VERBOSE" = "1" ]; then
+    printf "%b[ OK ]%b %s\n" "$GREEN" "$NC" "$1"
+  fi
 }
 
 log_warn() {
-    printf "%b[WARN]%b %s\n" "$YELLOW" "$NC" "$1"
+  printf "%b[WARN]%b %s\n" "$YELLOW" "$NC" "$1"
 }
 
 log_error() {
-    printf "%b[ERROR]%b %s\n" "$RED" "$NC" "$1" >&2
+  printf "%b[ERROR]%b %s\n" "$RED" "$NC" "$1" >&2
 }
 
 error_exit() {
-    log_error "$1"
-    exit 1
+  log_error "$1"
+  exit 1
 }
 
 update_progress() {
-    PERCENT=$(expr $CURRENT_STEP \* 100 / $TOTAL_STEPS)
-    BAR_LEN=40
-    FILLED=$(expr $PERCENT \* $BAR_LEN / 100)
-    EMPTY=$(expr $BAR_LEN - $FILLED)
-    
-    printf "\r   [%*s" $FILLED "" | tr ' ' '='
-    printf "%*s] %3d%%  %s" $EMPTY "" $PERCENT "$1"
+  PERCENT=$(expr $CURRENT_STEP \* 100 / $TOTAL_STEPS)
+  BAR_LEN=40
+  FILLED=$(expr $PERCENT \* $BAR_LEN / 100)
+  EMPTY=$(expr $BAR_LEN - $FILLED)
+
+  printf "\r   [%*s" $FILLED "" | tr ' ' '='
+  printf "%*s] %3d%%  %s" $EMPTY "" $PERCENT "$1"
 }
 
 log_step() {
-    CURRENT_STEP=$(expr $CURRENT_STEP + 1)
-    printf "%b[%d/%d]%b %s\n" "$BLUE" "$CURRENT_STEP" "$TOTAL_STEPS" "$NC" "$1"
-    update_progress "$1"
+  CURRENT_STEP=$(expr $CURRENT_STEP + 1)
+  printf "%b[%d/%d]%b %s\n" "$BLUE" "$CURRENT_STEP" "$TOTAL_STEPS" "$NC" "$1"
+  update_progress "$1"
 }
 
 add_completed() {
-    COMPLETED_STEPS="${COMPLETED_STEPS}
+  COMPLETED_STEPS="${COMPLETED_STEPS}
    ${GREEN}✓${NC} $1"
 }
 
 show_summary() {
-    printf "\n\n"
-    echo "   ╔══════════════════════════════════════════════════╗"
-    echo "   ║           Bootstrap Complete!                 ║"
-    echo "   ╠══════════════════════════════════════════════════╣"
-    echo "$COMPLETED_STEPS"
-    echo "   ╚══════════════════════════════════════════════════╝"
-    echo ""
+  printf "\n\n"
+  echo "   ╔══════════════════════════════════════════════════╗"
+  echo "   ║           Bootstrap Complete!                    ║"
+  echo "   ╠══════════════════════════════════════════════════╣"
+  echo "$COMPLETED_STEPS"
+  echo "   ╚══════════════════════════════════════════════════╝"
+  echo ""
 }
 
 command_exists() {
-    command -v "$1" >/dev/null 2>&1
+  command -v "$1" >/dev/null 2>&1
 }
 
 check_dependencies() {
-    log_step "Checking dependencies..."
+  log_step "Checking dependencies..."
 
-    MISSING=""
+  MISSING=""
 
-    for dep in git python3; do
-        if ! command_exists "$dep"; then
-            MISSING="$MISSING $dep"
-        fi
-    done
-
-    if ! command_exists ansible-core; then
-        MISSING="$MISSING ansible-core"
+  for dep in git python3; do
+    if ! command_exists "$dep"; then
+      MISSING="$MISSING $dep"
     fi
+  done
 
-    if [ -n "$MISSING" ]; then
-        log_warn "Missing:$MISSING"
-    else
-        log_success "All dependencies installed"
-    fi
+  if ! command_exists ansible-core; then
+    MISSING="$MISSING ansible-core"
+  fi
 
-    add_completed "Dependencies checked"
-    
-    if [ -n "$MISSING" ]; then
-        install_dependencies "$MISSING"
-    fi
+  if [ -n "$MISSING" ]; then
+    log_warn "Missing:$MISSING"
+  else
+    log_success "All dependencies installed"
+  fi
+
+  add_completed "Dependencies checked"
+
+  if [ -n "$MISSING" ]; then
+    install_dependencies "$MISSING"
+  fi
 }
 
 install_dependencies() {
-    MISSING_PKGS="$1"
-    log_step "Installing dependencies..."
-    sudo apt update && sudo apt install -y$MISSING_PKGS
-    add_completed "Dependencies installed"
+  MISSING_PKGS="$1"
+  log_step "Installing dependencies..."
+  sudo apt update && sudo apt install -y$MISSING_PKGS
+  add_completed "Dependencies installed"
 }
 
 setup_repo() {
-    log_step "Setting up repository..."
+  log_step "Setting up repository..."
 
-    if [ -d "$INSTALL_DIR" ]; then
-        log_success "Repository already exists"
-        cd "$INSTALL_DIR" || exit 1
-        git pull origin "$BRANCH"
-    else
-        git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR"
-        cd "$INSTALL_DIR" || exit 1
-    fi
-    
-    add_completed "Repository ready"
+  if [ -d "$INSTALL_DIR" ]; then
+    log_success "Repository already exists"
+    cd "$INSTALL_DIR" || exit 1
+    git pull origin "$BRANCH"
+  else
+    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR"
+    cd "$INSTALL_DIR" || exit 1
+  fi
+
+  add_completed "Repository ready"
 }
 
 install_ansible_deps() {
-    log_step "Installing Ansible dependencies..."
-    ansible-galaxy install -r requirements.yml
-    add_completed "Ansible deps ready"
+  log_step "Installing Ansible dependencies..."
+  ansible-galaxy install -r requirements.yml
+  add_completed "Ansible deps ready"
 }
 
 run_playbook() {
-    log_step "Running Ansible playbook..."
-    ansible-playbook main.yml -i inventory -K
-    add_completed "Playbook executed"
+  log_step "Running Ansible playbook..."
+  ansible-playbook main.yml -i inventory -K
+  add_completed "Playbook executed"
 }
 
 main() {
-    cat << 'EOF'
+  cat <<'EOF'
 
    ╔══════════════════════════════════════════════════╗
-   ║                                                      ║
-   ║   ██████╗ ██████╗ ██╗███████╗████████╗          ║
-   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝          ║
-   ║   ██████╔╝██████╔╝██║█████╗     ██║             ║
-   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║             ║
-   ║   ██║     ██║  ██║██║██║        ██║             ║
-   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝             ║
-   ║                                                      ║
-   ║        Ansible Development Setup                      ║
-   ║                                                      ║
+   ║                                                  ║
+   ║   ██████╗ ██████╗ ██╗███████╗████████╗           ║
+   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝           ║
+   ║   ██████╔╝██████╔╝██║█████╗     ██║              ║
+   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║              ║
+   ║   ██║     ██║  ██║██║██║        ██║              ║
+   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝              ║
+   ║                                                  ║
+   ║        Ansible Development Setup                 ║
+   ║                                                  ║
    ╚══════════════════════════════════════════════════╝
 
    ╔══════════════════════════════════════════════════╗
@@ -159,12 +159,12 @@ main() {
 
 EOF
 
-    check_dependencies
-    setup_repo
-    install_ansible_deps
-    run_playbook
+  check_dependencies
+  setup_repo
+  install_ansible_deps
+  run_playbook
 
-    show_summary
+  show_summary
 }
 
 main "$@"

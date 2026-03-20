@@ -36,7 +36,7 @@ command_exists() {
 
 run_step() {
   echo "   ● $1..."
-  eval "$3" > /dev/null 2>&1
+  eval "$3" >/dev/null 2>&1
   echo "   ✓ $2"
   echo ""
 }
@@ -52,22 +52,31 @@ check_dependencies() {
 
   if [ -n "$MISSING" ]; then
     log_warn "Missing:$MISSING"
-    sudo apt update > /dev/null 2>&1 && sudo apt install -y$MISSING > /dev/null 2>&1
+    sudo apt update >/dev/null 2>&1 && sudo apt install -y$MISSING >/dev/null 2>&1
   fi
 }
 
 setup_repo() {
   if [ -d "$INSTALL_DIR" ]; then
     cd "$INSTALL_DIR" || exit 1
-    git pull origin "$BRANCH" > /dev/null 2>&1
+    git pull origin "$BRANCH" >/dev/null 2>&1
   else
-    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR" > /dev/null 2>&1
+    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR" >/dev/null 2>&1
     cd "$INSTALL_DIR" || exit 1
   fi
 }
 
 install_ansible_deps() {
-  ansible-galaxy install -r requirements.yml > /dev/null 2>&1
+  ansible-galaxy install -r requirements.yml >/dev/null 2>&1
+}
+
+authenticate() {
+  sudo -n true >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    echo "   (already authenticated)"
+  else
+    sudo -v
+  fi
 }
 
 main() {
@@ -75,14 +84,14 @@ main() {
 
    ╔══════════════════════════════════════════════════╗
    ║                                                  ║
-   ║   ██████╗ ██████╗ ██╗███████╗████████╗          ║
-   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝          ║
-   ║   ██████╔╝██████╔╝██║█████╗     ██║             ║
-   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║             ║
-   ║   ██║     ██║  ██║██║██║        ██║             ║
-   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝             ║
+   ║   ██████╗ ██████╗ ██╗███████╗████████╗           ║
+   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝           ║
+   ║   ██████╔╝██████╔╝██║█████╗     ██║              ║
+   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║              ║
+   ║   ██║     ██║  ██║██║██║        ██║              ║
+   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝              ║
    ║                                                  ║
-   ║        Ansible Development Setup                      ║
+   ║        Ansible Development Setup                 ║
    ║                                                  ║
    ╚══════════════════════════════════════════════════╝
 
@@ -92,7 +101,7 @@ EOF
   run_step "Installing dependencies" "Installed dependencies" ":"
   run_step "Setting up repository" "Set up repository" "setup_repo"
   run_step "Installing Ansible deps" "Installed Ansible deps" "install_ansible_deps"
-  run_step "Caching sudo password" "Cached sudo password" "sudo -v"
+  run_step "Authenticating for playbook" "Authenticated for playbook" "authenticate"
   run_step "Running playbook" "Ran playbook" "ansible-playbook main.yml -i inventory"
 
   log_success

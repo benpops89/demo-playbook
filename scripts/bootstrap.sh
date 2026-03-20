@@ -27,7 +27,7 @@ error_exit() {
 }
 
 log_success() {
-  printf "\n   %bBootstrap complete! %b\n" "$GREEN" "$NC"
+  printf "\n   %bBootstrap complete! %b\n\n" "$GREEN" "$NC"
 }
 
 command_exists() {

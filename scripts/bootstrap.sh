@@ -88,15 +88,16 @@ check_dependencies() {
 
 install_dependencies() {
   log_step "Installing dependencies..."
-  sudo apt update && sudo apt install -y$1
+  sudo apt update > /dev/null && sudo apt install -y$1 > /dev/null
   add_completed "Dependencies installed"
 }
 
 setup_repo() {
   if [ -d "$INSTALL_DIR" ]; then
     cd "$INSTALL_DIR" || exit 1
+    git pull origin "$BRANCH" > /dev/null
   else
-    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR"
+    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR" > /dev/null
     cd "$INSTALL_DIR" || exit 1
   fi
   
@@ -105,13 +106,13 @@ setup_repo() {
 
 install_ansible_deps() {
   log_step "Installing Ansible deps..."
-  ansible-galaxy install -r requirements.yml
+  ansible-galaxy install -r requirements.yml > /dev/null
   add_completed "Ansible deps ready"
 }
 
 run_playbook() {
   log_step "Running playbook..."
-  ansible-playbook main.yml -i inventory -K
+  ansible-playbook main.yml -i inventory -K > /dev/null
   add_completed "Playbook executed"
 }
 

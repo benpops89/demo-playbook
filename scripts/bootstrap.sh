@@ -12,11 +12,6 @@ REPO="https://github.com/benpops89/demo-playbook.git"
 BRANCH="main"
 INSTALL_DIR="$HOME/demo-playbook"
 
-# Progress tracking
-TOTAL_STEPS=5
-CURRENT_STEP=0
-COMPLETED_STEPS=""
-
 # Functions
 log_warn() {
   printf "%b[WARN]%b %s\n" "$YELLOW" "$NC" "$1"
@@ -31,38 +26,29 @@ error_exit() {
   exit 1
 }
 
-update_progress() {
-  PERCENT=$(expr $CURRENT_STEP \* 100 / $TOTAL_STEPS)
-  BAR_LEN=40
-  FILLED=$(expr $PERCENT \* $BAR_LEN / 100)
-  EMPTY=$(expr $BAR_LEN - $FILLED)
-  
-  printf "\r   [%*s" $FILLED "" | tr ' ' '='
-  printf "%*s] %3d%%  %s" $EMPTY "" $PERCENT "$1"
-}
-
-log_step() {
-  CURRENT_STEP=$(expr $CURRENT_STEP + 1)
-  update_progress "$1"
-}
-
-add_completed() {
-  COMPLETED_STEPS="${COMPLETED_STEPS}
-   ${GREEN}✓${NC} $1"
-}
-
-show_summary() {
-  printf "\n\n"
-  echo "   ╔══════════════════════════════════════════════════╗"
-  echo "   ║           Bootstrap Complete!                     ║"
-  echo "   ╠══════════════════════════════════════════════════╣"
-  echo "$COMPLETED_STEPS"
-  echo "   ╚══════════════════════════════════════════════════╝"
-  echo ""
+log_success() {
+  printf "\n%bBootstrap complete!%b\n" "$GREEN" "$NC"
 }
 
 command_exists() {
   command -v "$1" >/dev/null 2>&1
+}
+
+show_steps() {
+  cat > /tmp/bootstrap_steps << 'EOF'
+   ○ Checking dependencies
+   ○ Installing dependencies
+   ○ Setting up repository
+   ○ Installing Ansible deps
+   ○ Running playbook
+EOF
+  cat /tmp/bootstrap_steps
+}
+
+complete_step() {
+  sed -i "s/○ $1/✓ $1/" /tmp/bootstrap_steps
+  printf "\n"
+  cat /tmp/bootstrap_steps
 }
 
 check_dependencies() {
@@ -83,13 +69,12 @@ check_dependencies() {
     install_dependencies "$MISSING"
   fi
 
-  add_completed "Dependencies checked"
+  complete_step "Checking dependencies"
 }
 
 install_dependencies() {
-  log_step "Installing dependencies..."
   sudo apt update > /dev/null 2>&1 && sudo apt install -y$1 > /dev/null 2>&1
-  add_completed "Dependencies installed"
+  complete_step "Installing dependencies"
 }
 
 setup_repo() {
@@ -101,19 +86,17 @@ setup_repo() {
     cd "$INSTALL_DIR" || exit 1
   fi
   
-  add_completed "Repository ready"
+  complete_step "Setting up repository"
 }
 
 install_ansible_deps() {
-  log_step "Installing Ansible deps..."
   ansible-galaxy install -r requirements.yml > /dev/null 2>&1
-  add_completed "Ansible deps ready"
+  complete_step "Installing Ansible deps"
 }
 
 run_playbook() {
-  log_step "Running playbook..."
   ansible-playbook main.yml -i inventory -K > /dev/null 2>&1
-  add_completed "Playbook executed"
+  complete_step "Running playbook"
 }
 
 main() {
@@ -135,12 +118,14 @@ main() {
 EOF
 
   echo ""
+  show_steps
   check_dependencies
   setup_repo
   install_ansible_deps
   run_playbook
 
-  show_summary
+  printf "\n"
+  log_success
 }
 
 main "$@"

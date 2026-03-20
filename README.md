@@ -1,6 +1,6 @@
 # Demo Ansible Playbook
 
-Ansible playbook for provisioning an Ubuntu development machine with a beautiful bootstrap experience.
+Ansible playbook for provisioning an Ubuntu development machine.
 
 ## Features
 
@@ -16,7 +16,7 @@ Ansible playbook for provisioning an Ubuntu development machine with a beautiful
 
 ### Option 1: Bootstrap Script (Recommended)
 
-One-command setup with beautiful UI:
+One-command setup:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/benpops89/demo-playbook/main/scripts/bootstrap.sh | sh
@@ -137,14 +137,6 @@ Users to add to the docker group for container access.
 
 - Ubuntu/Debian target
 - Python 3 on target
-
-## Target Machine Setup
-
-On a fresh Ubuntu machine:
-
-```bash
-sudo apt update && sudo apt install -y git python3
-```
 
 ## License
 

@@ -31,10 +31,20 @@ This will:
 ### Option 2: Manual Setup
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
+sudo apt update && sudo apt install -y git python3
+
+# 2. Install Ansible
+sudo apt install -y ansible-core
+
+# 3. Clone the repository
+git clone https://github.com/benpops89/demo-playbook.git
+cd demo-playbook
+
+# 4. Install Ansible dependencies
 ansible-galaxy install -r requirements.yml
 
-# Run the playbook
+# 5. Run the playbook
 ansible-playbook main.yml -i inventory -K
 ```
 

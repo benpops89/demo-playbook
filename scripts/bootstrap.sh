@@ -35,19 +35,20 @@ command_exists() {
 }
 
 show_steps() {
-  cat > /tmp/bootstrap_steps << 'EOF'
-   ○ Checking dependencies
-   ○ Installing dependencies
-   ○ Setting up repository
-   ○ Installing Ansible deps
-   ○ Running playbook
-EOF
-  cat /tmp/bootstrap_steps
+  echo "   ○ Checking dependencies"
+  echo ""
+  echo "   ○ Installing dependencies"
+  echo ""
+  echo "   ○ Setting up repository"
+  echo ""
+  echo "   ○ Installing Ansible deps"
+  echo ""
+  echo "   ○ Running playbook"
 }
 
-complete_step() {
+update_step() {
+  # Use sed to replace ○ with ✓ for completed step
   sed -i "s/○ $1/✓ $1/" /tmp/bootstrap_steps
-  printf "\n"
   cat /tmp/bootstrap_steps
 }
 
@@ -60,21 +61,17 @@ check_dependencies() {
     fi
   done
 
-  if ! command_exists ansible-core; then
-    MISSING="$MISSING ansible-core"
-  fi
-
   if [ -n "$MISSING" ]; then
     log_warn "Missing:$MISSING"
     install_dependencies "$MISSING"
+  else
+    update_step "Checking dependencies"
   fi
-
-  complete_step "Checking dependencies"
 }
 
 install_dependencies() {
   sudo apt update > /dev/null 2>&1 && sudo apt install -y$1 > /dev/null 2>&1
-  complete_step "Installing dependencies"
+  update_step "Installing dependencies"
 }
 
 setup_repo() {
@@ -86,45 +83,50 @@ setup_repo() {
     cd "$INSTALL_DIR" || exit 1
   fi
   
-  complete_step "Setting up repository"
+  update_step "Setting up repository"
 }
 
 install_ansible_deps() {
   ansible-galaxy install -r requirements.yml > /dev/null 2>&1
-  complete_step "Installing Ansible deps"
+  update_step "Installing Ansible deps"
 }
 
 run_playbook() {
   ansible-playbook main.yml -i inventory -K > /dev/null 2>&1
-  complete_step "Running playbook"
+  update_step "Running playbook"
 }
 
 main() {
   cat <<'EOF'
 
    ╔══════════════════════════════════════════════════╗
-   ║                                                  ║
-   ║   ██████╗ ██████╗ ██╗███████╗████████╗          ║
-   ║   ██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝          ║
-   ║   ██████╔╝██████╔╝██║█████╗     ██║             ║
-   ║   ██╔═══╝ ██╔══██╗██║██╔══╝     ██║             ║
-   ║   ██║     ██║  ██║██║██║        ██║             ║
-   ║   ╚═╝     ╚═╝  ╚═╝╚═╝╚═╝        ╚═╝             ║
-   ║                                                  ║
    ║        Ansible Development Setup                  ║
-   ║                                                  ║
    ╚══════════════════════════════════════════════════╝
 
 EOF
 
-  echo ""
-  show_steps
+  # Create temp file with steps
+  cat > /tmp/bootstrap_steps << 'STEPS'
+
+   ○ Checking dependencies
+
+   ○ Installing dependencies
+
+   ○ Setting up repository
+
+   ○ Installing Ansible deps
+
+   ○ Running playbook
+STEPS
+
+  cat /tmp/bootstrap_steps
+  
   check_dependencies
+  install_dependencies
   setup_repo
   install_ansible_deps
   run_playbook
 
-  printf "\n"
   log_success
 }
 

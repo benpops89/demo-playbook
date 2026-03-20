@@ -75,6 +75,7 @@ authenticate() {
   if [ $? -eq 0 ]; then
     echo "   (already authenticated)"
   else
+    echo "   "
     sudo -v
   fi
 }

@@ -36,8 +36,8 @@ command_exists() {
 
 run_step() {
   echo "   ● $1..."
-  eval "$2" > /dev/null 2>&1
-  echo "   ✓ $1"
+  eval "$3" > /dev/null 2>&1
+  echo "   ✓ $2"
   echo ""
 }
 
@@ -79,12 +79,12 @@ main() {
 
 EOF
 
-  run_step "Checking dependencies" "check_dependencies"
-  run_step "Installing dependencies" ":"
-  run_step "Setting up repository" "setup_repo"
-  run_step "Installing Ansible deps" "install_ansible_deps"
-  run_step "Caching sudo password" "sudo -v"
-  run_step "Running playbook" "ansible-playbook main.yml -i inventory"
+  run_step "Checking dependencies" "Checked dependencies" "check_dependencies"
+  run_step "Installing dependencies" "Installed dependencies" ":"
+  run_step "Setting up repository" "Set up repository" "setup_repo"
+  run_step "Installing Ansible deps" "Installed Ansible deps" "install_ansible_deps"
+  run_step "Caching sudo password" "Cached sudo password" "sudo -v"
+  run_step "Running playbook" "Ran playbook" "ansible-playbook main.yml -i inventory"
 
   log_success
 }

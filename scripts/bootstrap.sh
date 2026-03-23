@@ -52,7 +52,7 @@ check_dependencies() {
 
   if [ -n "$MISSING" ]; then
     log_warn "Missing:$MISSING"
-    sudo apt update >/dev/null 2>&1 && sudo apt install -y$MISSING >/dev/null 2>&1
+    echo "$SUDO_PASS" | sudo -S apt update >/dev/null 2>&1 && echo "$SUDO_PASS" | sudo -S apt install -y$MISSING >/dev/null 2>&1
   fi
 }
 
@@ -72,8 +72,22 @@ install_ansible_deps() {
 
 run_playbook() {
   cd "$INSTALL_DIR" || exit 1
-  ansible-playbook main.yml -i inventory >/dev/null 2>&1
+  PIPE=$(mktemp -u)
+  mkfifo "$PIPE"
+  chmod 600 "$PIPE"
+  echo "$SUDO_PASS" > "$PIPE" &
+  ansible-playbook main.yml -i inventory --become-password-file="$PIPE" >/dev/null 2>&1
+  rm -f "$PIPE"
+  PIPE=""
 }
+
+PIPE=""
+
+cleanup() {
+  stty echo 2>/dev/null
+  [ -n "$PIPE" ] && rm -f "$PIPE"
+}
+trap cleanup EXIT INT TERM HUP
 
 main() {
   cat <<'EOF'
@@ -94,14 +108,14 @@ main() {
 EOF
 
   echo "   ● Authenticating..."
-  AUTH_OUTPUT=$(sudo -n true 2>&1)
-  if [ -z "$AUTH_OUTPUT" ]; then
-    echo "   (already authenticated)"
-  else
-    echo "   "
-    sudo -v
-  fi
+  echo -n "   [sudo] password: "
+  stty -echo
+  read SUDO_PASS
+  stty echo
+  echo ""
+  echo "$SUDO_PASS" | sudo -S -v >/dev/null 2>&1
   echo "   ✓ Authenticated"
+  echo ""
 
   run_step "Installing dependencies" "Installed dependencies" "check_dependencies"
   run_step "Setting up repository" "Set up repository" "setup_repo"

@@ -70,6 +70,11 @@ install_ansible_deps() {
   ansible-galaxy install -r requirements.yml >/dev/null 2>&1
 }
 
+run_playbook() {
+  cd "$INSTALL_DIR" || exit 1
+  ansible-playbook main.yml -i inventory >/dev/null 2>&1
+}
+
 main() {
   cat <<'EOF'
 
@@ -102,7 +107,7 @@ EOF
   run_step "Setting up repository" "Set up repository" "setup_repo"
   run_step "Installing Ansible deps" "Installed Ansible deps" "install_ansible_deps"
 
-  run_step "Running playbook" "Ran playbook" "cd $INSTALL_DIR && ansible-playbook main.yml -i inventory"
+  run_step "Running playbook" "Ran playbook" "run_playbook"
 
   log_success
 }

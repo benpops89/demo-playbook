@@ -18,7 +18,6 @@ dotfiles_dir: "{{ ansible_user_dir }}/dotfiles"
 
 dotfiles_symlinks:
   - .zshrc
-  - .zshenv
   - .config/opencode
   - .config/nvim
   - .config/starship.toml

@@ -73,6 +73,7 @@ setup_repo() {
 }
 
 install_ansible_deps() {
+  cd "$INSTALL_DIR" || exit 1
   ansible-galaxy install -r requirements.yml || exit 1
 }
 

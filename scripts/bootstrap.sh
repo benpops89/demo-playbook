@@ -36,7 +36,12 @@ command_exists() {
 
 run_step() {
   echo "● $1..."
-  eval "$3" >/dev/null 2>&1
+  OUTPUT=$(eval "$3" 2>&1)
+  RESULT=$?
+  if [ $RESULT -ne 0 ]; then
+    echo "$OUTPUT" >&2
+    exit $RESULT
+  fi
   echo "✓ $2"
   echo ""
 }
@@ -52,28 +57,28 @@ check_dependencies() {
 
   if [ -n "$MISSING" ]; then
     log_warn "Missing:$MISSING"
-    sudo apt update 2>/dev/null || exit 1
-    sudo apt install -y$MISSING 2>/dev/null || exit 1
+    sudo apt update || exit 1
+    sudo apt install -y$MISSING || exit 1
   fi
 }
 
 setup_repo() {
   if [ -d "$INSTALL_DIR" ]; then
     cd "$INSTALL_DIR" || exit 1
-    git pull origin "$BRANCH" 2>/dev/null || exit 1
+    git pull origin "$BRANCH" || exit 1
   else
-    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR" 2>/dev/null || exit 1
+    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR" || exit 1
     cd "$INSTALL_DIR" || exit 1
   fi
 }
 
 install_ansible_deps() {
-  ansible-galaxy install -r requirements.yml 2>/dev/null || exit 1
+  ansible-galaxy install -r requirements.yml || exit 1
 }
 
 run_playbook() {
   cd "$INSTALL_DIR" || exit 1
-  ansible-playbook main.yml -i inventory -K 2>/dev/null || exit 1
+  ansible-playbook main.yml -i inventory -K || exit 1
 }
 
 main() {

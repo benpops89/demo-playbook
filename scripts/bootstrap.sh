@@ -97,7 +97,6 @@ EOF
     sudo -v
   fi
   echo "   ✓ Authenticated"
-  echo ""
 
   run_step "Installing dependencies" "Installed dependencies" "check_dependencies"
   run_step "Setting up repository" "Set up repository" "setup_repo"

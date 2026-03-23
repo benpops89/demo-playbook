@@ -27,7 +27,7 @@ error_exit() {
 }
 
 log_success() {
-  printf "\n   %bBootstrap complete! %b\n\n" "$GREEN" "$NC"
+  printf "\n%bBootstrap complete!%b\n\n" "$GREEN" "$NC"
 }
 
 command_exists() {
@@ -35,9 +35,9 @@ command_exists() {
 }
 
 run_step() {
-  echo "   ● $1..."
+  echo "● $1..."
   eval "$3" >/dev/null 2>&1
-  echo "   ✓ $2"
+  echo "✓ $2"
   echo ""
 }
 
@@ -94,9 +94,9 @@ main() {
 
 EOF
 
-  echo "   ● Authenticating..."
+  echo "● Authenticating..."
   sudo -v || exit 1
-  echo "   ✓ Authenticated"
+  echo "✓ Authenticated"
   echo ""
 
   run_step "Installing dependencies" "Installed dependencies" "check_dependencies"

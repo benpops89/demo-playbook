@@ -102,7 +102,7 @@ EOF
   run_step "Setting up repository" "Set up repository" "setup_repo"
   run_step "Installing Ansible deps" "Installed Ansible deps" "install_ansible_deps"
 
-  run_step "Running playbook" "Ran playbook" "ansible-playbook main.yml -i inventory"
+  run_step "Running playbook" "Ran playbook" "cd $INSTALL_DIR && ansible-playbook main.yml -i inventory"
 
   log_success
 }

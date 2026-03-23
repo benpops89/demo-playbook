@@ -88,7 +88,17 @@ main() {
 
 EOF
 
-  run_step "Authenticating" "Authenticated" "sudo -v"
+  echo "   ● Authenticating..."
+  AUTH_OUTPUT=$(sudo -n true 2>&1)
+  if [ -z "$AUTH_OUTPUT" ]; then
+    echo "   (already authenticated)"
+  else
+    echo "   "
+    sudo -v
+  fi
+  echo "   ✓ Authenticated"
+  echo ""
+
   run_step "Installing dependencies" "Installed dependencies" "check_dependencies"
   run_step "Setting up repository" "Set up repository" "setup_repo"
   run_step "Installing Ansible deps" "Installed Ansible deps" "install_ansible_deps"

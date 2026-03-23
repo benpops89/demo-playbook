@@ -1,7 +1,7 @@
 ---
 # Mise
-mise_version: "v2026.3.9"
-mise_sha256: "sha256:5302866459744a7bad872d7dccdc5e2cf5d32e80c46f142c805cc21c94dfb6ad"
+mise_version: "v2026.3.13"
+mise_sha256: "sha256:583bed85629f1f3583adcd07eb47ef2cfe94e88d5de30f4e1a5278f3a123b614"
 
 # App Packages
 apt_packages:

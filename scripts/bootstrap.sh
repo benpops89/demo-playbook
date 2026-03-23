@@ -44,7 +44,7 @@ run_step() {
 check_dependencies() {
   MISSING=""
 
-  for dep in git python3; do
+  for dep in git python3 ansible-core; do
     if ! command_exists "$dep"; then
       MISSING="$MISSING $dep"
     fi
@@ -88,21 +88,10 @@ main() {
 
 EOF
 
-  run_step "Checking dependencies" "Checked dependencies" "check_dependencies"
-  run_step "Installing dependencies" "Installed dependencies" ":"
+  run_step "Authenticating" "Authenticated" "sudo -v"
+  run_step "Installing dependencies" "Installed dependencies" "check_dependencies"
   run_step "Setting up repository" "Set up repository" "setup_repo"
   run_step "Installing Ansible deps" "Installed Ansible deps" "install_ansible_deps"
-
-  echo "   ● Authenticating for playbook..."
-  AUTH_OUTPUT=$(sudo -n true 2>&1)
-  if [ -z "$AUTH_OUTPUT" ]; then
-    echo "   (already authenticated)"
-  else
-    echo "   "
-    sudo -v
-  fi
-  echo "   ✓ Authenticated for playbook"
-  echo ""
 
   run_step "Running playbook" "Ran playbook" "ansible-playbook main.yml -i inventory"
 

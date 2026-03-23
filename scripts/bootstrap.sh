@@ -106,10 +106,14 @@ main() {
 EOF
 
   echo "   ● Authenticating..."
-  echo -n "   [sudo] password: "
-  stty -echo
-  read SUDO_PASS
-  stty echo
+  if [ -t 0 ]; then
+    echo -n "   [sudo] password: "
+    stty -echo
+    read SUDO_PASS
+    stty echo
+  else
+    read SUDO_PASS
+  fi
   echo ""
   echo "$SUDO_PASS" | sudo -S -v >/dev/null 2>&1
   echo "   ✓ Authenticated"

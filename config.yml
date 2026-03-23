@@ -26,6 +26,7 @@ dotfiles_symlinks:
   - .config/lazygit
   - .config/sheldon
   - .config/wezterm
+  - .config/mise
 
 # Users in the docker group
 docker_users:

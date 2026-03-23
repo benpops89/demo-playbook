@@ -77,8 +77,6 @@ run_playbook() {
   chmod 600 "$PIPE"
   echo "$SUDO_PASS" > "$PIPE" &
   ansible-playbook main.yml -i inventory --become-password-file="$PIPE" >/dev/null 2>&1
-  rm -f "$PIPE"
-  PIPE=""
 }
 
 PIPE=""

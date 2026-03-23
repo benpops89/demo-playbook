@@ -52,40 +52,29 @@ check_dependencies() {
 
   if [ -n "$MISSING" ]; then
     log_warn "Missing:$MISSING"
-    echo "$SUDO_PASS" | sudo -S apt update >/dev/null 2>&1 && echo "$SUDO_PASS" | sudo -S apt install -y$MISSING >/dev/null 2>&1
+    sudo apt update 2>/dev/null || exit 1
+    sudo apt install -y$MISSING 2>/dev/null || exit 1
   fi
 }
 
 setup_repo() {
   if [ -d "$INSTALL_DIR" ]; then
     cd "$INSTALL_DIR" || exit 1
-    git pull origin "$BRANCH" >/dev/null 2>&1
+    git pull origin "$BRANCH" 2>/dev/null || exit 1
   else
-    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR" >/dev/null 2>&1
+    git clone -b "$BRANCH" "$REPO" "$INSTALL_DIR" 2>/dev/null || exit 1
     cd "$INSTALL_DIR" || exit 1
   fi
 }
 
 install_ansible_deps() {
-  ansible-galaxy install -r requirements.yml >/dev/null 2>&1
+  ansible-galaxy install -r requirements.yml 2>/dev/null || exit 1
 }
 
 run_playbook() {
   cd "$INSTALL_DIR" || exit 1
-  PIPE=$(mktemp -u)
-  mkfifo "$PIPE"
-  chmod 600 "$PIPE"
-  echo "$SUDO_PASS" > "$PIPE" &
-  ansible-playbook main.yml -i inventory --become-password-file="$PIPE" >/dev/null 2>&1
+  ansible-playbook main.yml -i inventory -K 2>/dev/null || exit 1
 }
-
-PIPE=""
-
-cleanup() {
-  stty echo 2>/dev/null
-  [ -n "$PIPE" ] && rm -f "$PIPE"
-}
-trap cleanup EXIT INT TERM HUP
 
 main() {
   cat <<'EOF'
@@ -106,16 +95,7 @@ main() {
 EOF
 
   echo "   ● Authenticating..."
-  if [ -t 0 ]; then
-    echo -n "   [sudo] password: "
-    stty -echo
-    read SUDO_PASS
-    stty echo
-  else
-    read SUDO_PASS
-  fi
-  echo ""
-  echo "$SUDO_PASS" | sudo -S -v >/dev/null 2>&1
+  sudo -v || exit 1
   echo "   ✓ Authenticated"
   echo ""
 
